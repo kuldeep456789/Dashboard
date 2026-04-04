@@ -1,65 +1,838 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useRef, useState } from "react";
+import { useNotification } from "@/context/NotificationContext";
+
+const activities = [
+  {
+    icon: "shopping_bag",
+    iconColor: "var(--theme-secondary)",
+    title: "Apple Store Purchase",
+    subtitle: "2 hours ago • Electronic",
+    amount: "-$1,299.00",
+    amountColor: "var(--theme-on-surface)",
+  },
+  {
+    icon: "account_balance",
+    iconColor: "var(--theme-tertiary)",
+    title: "Dividend Payout",
+    subtitle: "Yesterday • Investment",
+    amount: "+$450.25",
+    amountColor: "var(--theme-tertiary)",
+  },
+  {
+    icon: "restaurant",
+    iconColor: "var(--theme-primary)",
+    title: "The Gourmet Kitchen",
+    subtitle: "Mar 24 • Dining",
+    amount: "-$84.50",
+    amountColor: "var(--theme-on-surface)",
+  },
+];
+
+const categories = [
+  { label: "Housing", pct: "45%", color: "var(--theme-primary)" },
+  { label: "Food", pct: "25%", color: "var(--theme-secondary)" },
+  { label: "Entertainment", pct: "15%", color: "var(--theme-tertiary)" },
+  { label: "Transport", pct: "15%", color: "var(--theme-primary-dim)" },
+];
+
+const trendData = [
+  { month: "Jan", value: 36120, x: 0, y: 180 },
+  { month: "Feb", value: 38440, x: 140, y: 152 },
+  { month: "Mar", value: 41880, x: 280, y: 120 },
+  { month: "Apr", value: 43420, x: 420, y: 106 },
+  { month: "May", value: 46210, x: 580, y: 58 },
+  { month: "Jun", value: 48920, x: 800, y: 24 },
+];
+
+const trendChartWidth = 800;
+const trendChartHeight = 200;
+
+const trendLinePath = trendData
+  .map((point, index) => `${index === 0 ? "M" : "L"}${point.x},${point.y}`)
+  .join(" ");
+
+const trendAreaPath = `${trendLinePath} L${trendData[trendData.length - 1].x},${trendChartHeight} L${trendData[0].x},${trendChartHeight} Z`;
+
+export default function DashboardPage() {
+  const { showToast } = useNotification();
+  const trendChartRef = useRef<HTMLDivElement | null>(null);
+  const [activeTrendIndex, setActiveTrendIndex] = useState(trendData.length - 1);
+
+  const activeTrendPoint = trendData[activeTrendIndex];
+
+  const setNearestTrendPoint = (clientX: number) => {
+    const container = trendChartRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    if (rect.width <= 0) return;
+
+    const clampedRatio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+    const pointerX = clampedRatio * trendChartWidth;
+
+    let nearestIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    for (let i = 0; i < trendData.length; i += 1) {
+      const distance = Math.abs(trendData[i].x - pointerX);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = i;
+      }
+    }
+
+    setActiveTrendIndex(nearestIndex);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="max-w-7xl mx-auto space-y-8">
+      {/* Summary Grid */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {/* Total Balance */}
+        <div
+          className="glass-card"
+          style={{
+            padding: "1.5rem",
+            borderRadius: "0.75rem",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: "1rem",
+              right: "1rem",
+              opacity: 0.1,
+            }}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: "4rem" }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              account_balance_wallet
+            </span>
+          </div>
+          <p
+            style={{
+              color: "var(--theme-on-surface-variant)",
+              fontSize: "0.75rem",
+              fontWeight: 500,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              marginBottom: "0.5rem",
+            }}
+          >
+            Total Balance
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <h2
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "2.25rem",
+              fontWeight: 800,
+              color: "var(--theme-primary)",
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            $45,230.12
+          </h2>
+          <div
+            style={{
+              marginTop: "1rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              color: "var(--theme-tertiary)",
+              fontSize: "0.875rem",
+            }}
           >
-            Documentation
-          </a>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: "0.875rem" }}
+            >
+              trending_up
+            </span>
+            <span style={{ fontWeight: 500 }}>+12.5% from last month</span>
+          </div>
         </div>
-      </main>
+
+        {/* Monthly Income */}
+        <div
+          className="glass-card"
+          style={{
+            padding: "1.5rem",
+            borderRadius: "0.75rem",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <p
+            style={{
+              color: "var(--theme-on-surface-variant)",
+              fontSize: "0.75rem",
+              fontWeight: 500,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              marginBottom: "0.5rem",
+            }}
+          >
+            Monthly Income
+          </p>
+          <h2
+            className="emissive-positive"
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "2.25rem",
+              fontWeight: 800,
+              color: "var(--theme-on-surface)",
+            }}
+          >
+            $8,420.00
+          </h2>
+          <div
+            style={{
+              marginTop: "1rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              color: "var(--theme-on-surface-variant)",
+              fontSize: "0.875rem",
+            }}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: "0.875rem" }}
+            >
+              calendar_today
+            </span>
+            <span style={{ fontWeight: 500 }}>Expected: $9,000.00</span>
+          </div>
+        </div>
+
+        {/* Monthly Expenses */}
+        <div
+          className="glass-card"
+          style={{
+            padding: "1.5rem",
+            borderRadius: "0.75rem",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <p
+            style={{
+              color: "var(--theme-on-surface-variant)",
+              fontSize: "0.75rem",
+              fontWeight: 500,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              marginBottom: "0.5rem",
+            }}
+          >
+            Monthly Expenses
+          </p>
+          <h2
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "2.25rem",
+              fontWeight: 800,
+              color: "var(--theme-secondary)",
+            }}
+          >
+            $3,150.45
+          </h2>
+          <div
+            style={{
+              marginTop: "1rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              color: "var(--theme-error)",
+              fontSize: "0.875rem",
+            }}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: "0.875rem" }}
+            >
+              trending_down
+            </span>
+            <span style={{ fontWeight: 500 }}>8% higher than average</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Dashboard Body */}
+      <div className="grid grid-cols-1 gap-8">
+        <div className="dashboard-grid">
+          {/* Left Column */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            {/* Balance Trend Chart */}
+            <div
+              style={{
+                background: "var(--theme-surface-container-low)",
+                padding: "2rem",
+                borderRadius: "0.75rem",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-end",
+                  marginBottom: "2rem",
+                }}
+              >
+                <div>
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "1.5rem",
+                      fontWeight: 700,
+                      color: "var(--theme-on-surface)",
+                    }}
+                  >
+                    Balance Trend
+                  </h3>
+                  <p style={{ color: "var(--theme-on-surface-variant)", fontSize: "0.875rem" }}>
+                    Net worth progression over the last 6 months
+                  </p>
+                </div>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  {["6M", "1Y", "ALL"].map((period) => (
+                    <button
+                      key={period}
+                      style={{
+                        padding: "0.25rem 0.75rem",
+                        borderRadius: "0.375rem",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        background:
+                          period === "6M" ? "#152c4e" : "transparent",
+                        color: period === "6M" ? "var(--theme-primary)" : "var(--theme-on-surface-variant)",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {period}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* SVG Line Chart */}
+              <div
+                ref={trendChartRef}
+                style={{ position: "relative", height: "16rem", width: "100%", touchAction: "pan-y" }}
+                onMouseMove={(event) => setNearestTrendPoint(event.clientX)}
+                onMouseLeave={() => setActiveTrendIndex(trendData.length - 1)}
+                onTouchStart={(event) => {
+                  if (event.touches[0]) {
+                    setNearestTrendPoint(event.touches[0].clientX);
+                  }
+                }}
+                onTouchMove={(event) => {
+                  if (event.touches[0]) {
+                    setNearestTrendPoint(event.touches[0].clientX);
+                  }
+                }}
+              >
+                <svg
+                  viewBox={`0 0 ${trendChartWidth} ${trendChartHeight}`}
+                  preserveAspectRatio="none"
+                  style={{ width: "100%", height: "100%" }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="chartGradient"
+                      x1="0%"
+                      y1="0%"
+                      x2="0%"
+                      y2="100%"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor="var(--theme-primary)"
+                        stopOpacity="0.3"
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="var(--theme-primary)"
+                        stopOpacity="0"
+                      />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d={trendAreaPath}
+                    fill="url(#chartGradient)"
+                  />
+                  <path
+                    d={trendLinePath}
+                    fill="none"
+                    stroke="var(--theme-primary)"
+                    strokeWidth="3"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                  />
+                  {trendData.map((point, index) => {
+                    const isActive = activeTrendIndex === index;
+                    return (
+                      <circle
+                        key={point.month}
+                        cx={point.x}
+                        cy={point.y}
+                        r={isActive ? 6 : 4.5}
+                        fill="var(--theme-primary)"
+                        stroke="var(--theme-surface)"
+                        strokeWidth={isActive ? 2.5 : 1.5}
+                        onMouseEnter={() => setActiveTrendIndex(index)}
+                        onClick={() => setActiveTrendIndex(index)}
+                        style={{
+                          cursor: "pointer",
+                          filter: isActive ? "drop-shadow(0 0 8px var(--theme-primary))" : "none",
+                          transition: "r 0.2s ease",
+                        }}
+                      />
+                    );
+                  })}
+                </svg>
+
+                {/* Tooltip */}
+                <div
+                  className="glass-card"
+                  style={{
+                    position: "absolute",
+                    top: `${Math.max((activeTrendPoint.y / trendChartHeight) * 100, 16)}%`,
+                    left: `${(activeTrendPoint.x / trendChartWidth) * 100}%`,
+                    transform: "translate(-50%, -120%)",
+                    border: "1px solid color-mix(in srgb, var(--theme-primary) 20%, transparent)",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "0.5rem",
+                    textAlign: "center",
+                    pointerEvents: "none",
+                    minWidth: "8.6rem",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "0.625rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.1em",
+                      color: "var(--theme-on-surface-variant)",
+                    }}
+                  >
+                    {activeTrendPoint.month} Balance
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "1.125rem",
+                      fontWeight: 700,
+                      color: "var(--theme-on-surface)",
+                    }}
+                  >
+                    ${activeTrendPoint.value.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              {/* X-axis labels */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "1rem",
+                  fontSize: "0.625rem",
+                  color: "var(--theme-on-surface-variant)",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                }}
+              >
+                {trendData.map((point, index) => (
+                  <span
+                    key={point.month}
+                    onMouseEnter={() => setActiveTrendIndex(index)}
+                    style={{
+                      cursor: "pointer",
+                      color:
+                        activeTrendIndex === index
+                          ? "var(--theme-primary)"
+                          : "var(--theme-on-surface-variant)",
+                    }}
+                  >
+                    {point.month}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Activities */}
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "0 0.5rem",
+                  marginBottom: "1rem",
+                }}
+              >
+                <h3
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "1.25rem",
+                    fontWeight: 700,
+                    color: "var(--theme-on-surface)",
+                  }}
+                >
+                  Recent Activities
+                </h3>
+                <button
+                  onClick={() => showToast("Navigation", "Navigating to full transaction history...", "info")}
+                  style={{
+                    color: "var(--theme-primary)",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  View All
+                </button>
+              </div>
+              <div
+                style={{
+                  background: "var(--theme-surface-container-high)",
+                  borderRadius: "0.75rem",
+                  overflow: "hidden",
+                }}
+              >
+                {activities.map((act, i) => (
+                  <div
+                    key={i}
+                    onClick={() => showToast("Transaction Selected", `Viewing details for ${act.title}`, "info")}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "1rem",
+                      cursor: "pointer",
+                      transition: "background 0.2s",
+                      borderBottom:
+                        i < activities.length - 1
+                          ? "1px solid rgba(255,255,255,0.05)"
+                          : "none",
+                    }}
+                    className="activity-row"
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "1rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          background: "var(--theme-surface-container-high)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: act.iconColor,
+                          border: "1px solid rgba(255,255,255,0.05)",
+                        }}
+                      >
+                        <span className="material-symbols-outlined">
+                          {act.icon}
+                        </span>
+                      </div>
+                      <div>
+                        <p
+                          style={{
+                            color: "var(--theme-on-surface)",
+                            fontWeight: 600,
+                            fontSize: "0.875rem",
+                          }}
+                        >
+                          {act.title}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "var(--theme-on-surface-variant)",
+                          }}
+                        >
+                          {act.subtitle}
+                        </p>
+                      </div>
+                    </div>
+                    <p
+                      style={{
+                        color: act.amountColor,
+                        fontWeight: 700,
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {act.amount}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+            {/* Category Breakdown */}
+            <div
+              style={{
+                background: "var(--theme-surface-container-high)",
+                padding: "2rem",
+                borderRadius: "0.75rem",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  fontSize: "1.25rem",
+                  fontWeight: 700,
+                  color: "var(--theme-on-surface)",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                Category Breakdown
+              </h3>
+
+              {/* Doughnut Chart */}
+              <div
+                style={{
+                  position: "relative",
+                  width: 192,
+                  height: 192,
+                  margin: "0 auto 2rem",
+                }}
+              >
+                <svg
+                  viewBox="0 0 36 36"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    transform: "rotate(-90deg)",
+                  }}
+                >
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="16"
+                    fill="transparent"
+                    stroke="#152c4e"
+                    strokeWidth="4"
+                  />
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="16"
+                    fill="transparent"
+                    stroke="var(--theme-primary)"
+                    strokeWidth="4"
+                    strokeDasharray="45 100"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="16"
+                    fill="transparent"
+                    stroke="var(--theme-secondary)"
+                    strokeWidth="4"
+                    strokeDasharray="25 100"
+                    strokeDashoffset="-45"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="16"
+                    fill="transparent"
+                    stroke="var(--theme-tertiary)"
+                    strokeWidth="4"
+                    strokeDasharray="15 100"
+                    strokeDashoffset="-70"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="16"
+                    fill="transparent"
+                    stroke="var(--theme-primary-dim)"
+                    strokeWidth="4"
+                    strokeDasharray="15 100"
+                    strokeDashoffset="-85"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "1.5rem",
+                      fontWeight: 700,
+                      color: "var(--theme-on-surface)",
+                    }}
+                  >
+                    64%
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "0.625rem",
+                      color: "var(--theme-on-surface-variant)",
+                      textTransform: "uppercase",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Limit
+                  </p>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <ul style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {categories.map((cat, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: "50%",
+                          background: cat.color,
+                        }}
+                      />
+                      <span
+                        style={{ fontSize: "0.875rem", color: "#cbd5e1" }}
+                      >
+                        {cat.label}
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 700,
+                        color: "var(--theme-on-surface)",
+                      }}
+                    >
+                      {cat.pct}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Market Pulse */}
+            <div
+              style={{
+                background: "var(--theme-surface-container-low)",
+                borderRadius: "0.75rem",
+                padding: "1.5rem",
+                position: "relative",
+                overflow: "hidden",
+              }}
+              className="market-pulse"
+            >
+              {/* BG Glow Effect */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "radial-gradient(ellipse at 30% 50%, rgba(88,245,209,0.08), transparent 70%)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div style={{ position: "relative", zIndex: 10 }}>
+                <h4
+                  style={{
+                    fontWeight: 700,
+                    color: "var(--theme-tertiary)",
+                    marginBottom: "0.25rem",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Market Pulse
+                </h4>
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#cbd5e1",
+                    marginBottom: "1rem",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Tech stocks are showing bullish patterns in early trading.
+                </p>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "1.125rem",
+                      fontWeight: 700,
+                      color: "var(--theme-on-surface)",
+                    }}
+                  >
+                    NASDAQ
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.875rem",
+                      fontWeight: 700,
+                      color: "var(--theme-tertiary)",
+                      textShadow: "0 0 12px rgba(184, 255, 187, 0.3)",
+                    }}
+                  >
+                    +1.42%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

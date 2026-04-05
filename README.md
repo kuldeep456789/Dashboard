@@ -3,10 +3,12 @@
 high-end financial management dashboard built with Next.js, designed to provide a seamless overview of your wealth and transactions.
 
 ##Desktop View
+
 ![image alt](https://github.com/kuldeep456789/Dashboard/blob/b0b25ee440ac7455da07fc9cf7df929fd09bf8f3/image.png)
 
 ##Mobile View
 
+![image alt]()
 
 
 #Getting Started

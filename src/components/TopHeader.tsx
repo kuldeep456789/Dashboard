@@ -40,7 +40,7 @@ export function TopHeader() {
   const { showToast } = useNotification();
   const { theme, cycleTheme } = useTheme();
   const { isSidebarCollapsed } = useLayout();
-  const desktopSidebarWidth = isSidebarCollapsed ? 80 : 256;
+  const desktopSidebarWidth = isSidebarCollapsed ? 88 : 272;
 
   const handleThemeToggle = () => {
     cycleTheme();
@@ -51,8 +51,8 @@ export function TopHeader() {
     <header
       className="fixed top-3 sm:top-4 left-1/2 lg:left-[var(--header-desktop-left)] -translate-x-1/2 z-[60] flex justify-between items-center px-3 sm:px-4 lg:px-5 h-[58px] lg:h-[66px] rounded-2xl transition-all duration-300 w-[var(--header-mobile-width)] lg:w-[var(--header-desktop-width)]"
       style={{
-        "--header-mobile-width": "min(1120px, calc(100vw - 0.75rem))",
-        "--header-desktop-width": `min(1120px, calc(100vw - ${desktopSidebarWidth}px - 1.25rem))`,
+        "--header-mobile-width": "min(1240px, calc(100vw - 0.75rem))",
+        "--header-desktop-width": `min(1380px, calc(100vw - ${desktopSidebarWidth}px - 1.25rem))`,
         "--header-desktop-left": `calc(${desktopSidebarWidth}px + (100vw - ${desktopSidebarWidth}px) / 2)`,
         background: "color-mix(in srgb, var(--theme-surface-bright) 90%, transparent)",
         backdropFilter: "blur(16px)",

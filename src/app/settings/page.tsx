@@ -254,7 +254,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="mx-auto w-full max-w-[1400px] space-y-8">
       {/* Role Banner */}
       <div
         style={{

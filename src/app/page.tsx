@@ -94,7 +94,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="mx-auto w-full max-w-[1400px] space-y-8">
       {/* Summary Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {/* Total Balance */}

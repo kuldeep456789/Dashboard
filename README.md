@@ -1,69 +1,38 @@
-# Finance Board
+# Finance Dashboard 🚀
 
-A responsive finance dashboard built with Next.js App Router, React, TypeScript, and Tailwind CSS.
+A premium, high-end financial management dashboard built with Next.js and React, designed to provide a seamless overview of your wealth and transactions.
 
-## What This Project Includes
-- Dashboard cards and visual summaries
-- Transactions page with filtering, searching, and sorting
-- Insights page with charts and spending highlights
-- Settings page with profile and preferences UI
-- Mobile bottom navigation and desktop sidebar layout
-- Theme support and role-based UI behavior (frontend simulation)
+## 🛠️ Getting Started
 
-## Tech Stack
-- Next.js 16 (App Router)
-- React 19
-- TypeScript
-- Tailwind CSS 4 + custom global CSS
-- React Context API for shared state
+Follow these simple steps to get the project running on your local machine:
 
-## Project Structure
-```text
-src/
-  app/
-    layout.tsx
-    globals.css
-    page.tsx
-    transactions/page.tsx
-    insights/page.tsx
-    settings/page.tsx
-  components/
-    AppLayoutHandler.tsx
-    TopHeader.tsx
-    Sidebar.tsx
-    MobileNav.tsx
-    BarChart.tsx
-    PortfolioChart.tsx
-    DoughnutChart.tsx
-  context/
-    ThemeContext.tsx
-    RoleContext.tsx
-    LayoutContext.tsx
-    NotificationContext.tsx
-```
-
-## Getting Started
+### 1. Install Dependencies
+Open your terminal in the project directory and run:
 ```bash
 npm install
+```
+
+### 2. Start the Development Server
+Launch the application with:
+```bash
 npm run dev
 ```
 
-Then open `http://localhost:3000`.
+### 3. Open the App
+Go to [http://localhost:3000](http://localhost:3000) in your browser to see the dashboard live.
 
-## Scripts
-- `npm run dev` - Start local development server
-- `npm run lint` - Run ESLint
-- `npm run build` - Build for production
+## ✨ Project Features
+- **Real-time Overview**: Instant pulse on your portfolio and cash flow.
+- **Transaction Manager**: Track, search, and filter your spending history.
+- **Smart Insights**: Interactive charts showing your balance trends and spending categories.
+- **Premium UI**: Modern animations, glass-morphism effects, and dynamic Dark/Light modes.
+- **Security Vault**: Manage secure credentials and access levels (Admin/Viewer).
 
-## Architecture Notes
-- Global providers are configured in `src/app/layout.tsx`.
-- App-level layout logic (header, sidebar, mobile nav) lives in `src/components/AppLayoutHandler.tsx`.
-- Theme, layout, role, and toast state are managed through dedicated context files in `src/context`.
-- Data shown in the dashboard is currently mock/static (no backend integration).
+## 🎨 How to Update the Logo on GitHub
+To replace the dashboard logo with your own:
+1. **Upload File**: Go to the `public/` folder in your repository.
+2. **Replace Logo**: Upload your new image and name it exactly `logo.png`.
+3. **Commit & Push**: Save your changes. The dashboard will automatically update to use your new logo.
 
-## 🎨 Logo Customization
-To update the logo on GitHub:
-1.  **Replace File**: Upload your new image to the `public/` folder and name it `logo.png`.
-2.  **Commit & Push**: Commit the change and push it to your repository.
-3.  **Automatic update**: The dashboard will automatically use the new `logo.png`.
-
+---
+Built with Next.js, React, and TypeScript.

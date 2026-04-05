@@ -8,7 +8,7 @@ high-end financial management dashboard built with Next.js, designed to provide 
 
 ##Mobile View
 
-![image alt]()
+![image alt](https://github.com/kuldeep456789/Dashboard/blob/b9fe82964dc367fc74a947f98df1ba24aa4965e8/mobile%20view.jpeg)
 
 
 #Getting Started
